@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-"""URL definitions."""
-from tipfy.routing import Rule
+from tipfy.routing import Rule, HandlerPrefix
 
 rules = [
-    Rule('/', name='hello-world', handler='hello_world.handlers.HelloWorldHandler'),
-    Rule('/pretty', name='hello-world-pretty', handler='hello_world.handlers.PrettyHelloWorldHandler'),
+    HandlerPrefix('guesschat.view.', [
+        Rule('/', name='home', handler='Home'),
+        Rule('/about', name='about', handler='About')
+    ])
 ]

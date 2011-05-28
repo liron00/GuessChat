@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        {% block head %}
+        <link rel="stylesheet" href="style.css" />
+        <title>{% block title %}{{ title }} | GuessChat{% endblock %}</title>
+        {% endblock %}
+    </head>
+
+    <body>
+        <h1><a href="/">GuessChat</a></h1>
+
+        <div id="static_body">
+            {% block static_body %}
+                Welcome. <a href="/about">About</a>
+            {% endblock %}
+        </div>
+
+        {% block footer %}
+        <div id="footer" style="margin-top:30px;">
+            &copy; 2010 GuessChat
+        </div>
+        {% endblock %}
+    </body>
+</html>
