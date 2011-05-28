@@ -3,7 +3,7 @@
     <head>
         {% block head %}
         <link rel="stylesheet" href="style.css" />
-        <title>{% block title %}{{ title }} | GuessChat{% endblock %}</title>
+        <title>{% block title %}{{ title }}{% endblock %}</title>
         {% endblock %}
     </head>
 
@@ -12,7 +12,8 @@
 
         <div id="static_body">
             {% block static_body %}
-                Welcome. <a href="/about">About</a>
+                Welcome. <a href="/about">About</a><br>
+                {{ contents }}
             {% endblock %}
         </div>
 
