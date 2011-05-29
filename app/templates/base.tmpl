@@ -2,7 +2,8 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
     <head>
         {% block head %}
-        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="/static/css/main.css" />
+
         <title>{% block title %}{{ title }}{% endblock %}</title>
         {% endblock %}
     </head>
@@ -22,5 +23,7 @@
             &copy; 2010 GuessChat
         </div>
         {% endblock %}
+
+        {{ '\n'.join(script_tags) | safe }}
     </body>
 </html>

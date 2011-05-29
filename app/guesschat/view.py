@@ -1,8 +1,11 @@
+import logging
+
 from tipfy.app import Response
 from tipfy.handler import RequestHandler
 from tipfyext.jinja2 import Jinja2Mixin
 from google.appengine.ext import db
 
+import js
 from guesschat.writing import eventlogging
 
 class ViewHandler(RequestHandler, Jinja2Mixin):
@@ -14,6 +17,8 @@ class ViewHandler(RequestHandler, Jinja2Mixin):
         else:
             params['title'] = 'GuessChat'
 
+        params['script_tags'] = js.get_script_tags()
+
         return self.render_response(path, **params)
 
     def log_event(self, name, **properties):
@@ -21,6 +26,18 @@ class ViewHandler(RequestHandler, Jinja2Mixin):
         properties['path'] = self.request.path
 
         eventlogging.log_event(name, **properties)
+
+class JS(ViewHandler):
+    def get(self):
+        response = Response(js.get_js())
+        response.headers['Content-Type'] = 'text/javascript'
+        return response
+
+class JS_Constants(ViewHandler):
+    def get(self):
+        response = Response(js.get_constants())
+        response.headers['Content-Type'] = 'text/javascript'
+        return response
 
 class Home(ViewHandler):
     def get(self):
