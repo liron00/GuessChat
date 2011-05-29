@@ -24,7 +24,7 @@ $.extend(G.page, {
 
         window.fbAsyncInit = function() {
             FB.init({
-                "appId": G.constants.fbAppId,
+                "appId": G.constants.facebookAppId,
                 "status": true,
                 "cookie": true,
                 "xfbml": true
