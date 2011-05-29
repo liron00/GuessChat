@@ -22,6 +22,22 @@ $.extend(G.page, {
     onLoad: function() {
         $("#everything").show();
 
+        window.fbAsyncInit = function() {
+            FB.init({
+                "appId": G.constants.fbAppId,
+                "status": true,
+                "cookie": true,
+                "xfbml": true
+            });
+        };
+
+        $("#fb-root").append(
+            $("<script>").attr({
+                "async": true,
+                "src": document.location.protocol + "//connect.facebook.net/en_US/all.js"
+            })
+        );
+
         if (G.page.name) {
             G.pages[G.page.name]();
         }
