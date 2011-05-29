@@ -36,8 +36,7 @@ def get_js_file_paths(deb=False):
         'jquery.scrollTo.js',
         'jquery.hashchange.js',
         'date.js',
-        'md5.js',
-        'showdown.js'
+        'md5.js'
     ):
         libfilepath = os.path.join('lib', libfilename)
         js_file_paths.append(libfilepath)

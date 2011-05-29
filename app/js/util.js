@@ -100,7 +100,7 @@ G.get = function(method, params, callback) {
             if (callback) {
                 callback(data || {
                     "rc": -1,
-                    "msg": "There was a problem communicating with the Quixey server."
+                    "msg": "There was a problem communicating with the server."
                 });
             }
         },
@@ -112,7 +112,7 @@ G.get = function(method, params, callback) {
             if (callback) {
                 callback({
                     "rc": -1,
-                    "msg": "There was a problem communicating with the Quixey server.",
+                    "msg": "There was a problem communicating with the server.",
                     "xhr": xhr,
                     "err": err
                 });
@@ -151,7 +151,7 @@ G.post = function(method, params, callback) {
             if (callback) {
                 callback(data || {
                     "rc": -1,
-                    "msg": "There was a problem communicating with the Quixey server."
+                    "msg": "There was a problem communicating with the server."
                 });
             }
         },
@@ -159,7 +159,7 @@ G.post = function(method, params, callback) {
             if (callback) {
                 callback({
                     "rc": -1,
-                    "msg": "There was a problem communicating with the Quixey server.",
+                    "msg": "There was a problem communicating with the server.",
                     "xhr": xhr,
                     "err": err
                 });
@@ -1121,7 +1121,7 @@ G.util = {
         }
 
         elem.css({
-            "color": G.colors.quixey,
+            "color": G.colors.primary,
             "background": "none",
             "padding": 0
         }).css(
@@ -1579,31 +1579,6 @@ G.util = {
         return true;
     },
 
-    markdownToSafeHtml: (function() {
-        // Instantiate a single converter object for all Markdown parsing
-        var converter = new Showdown.converter();
-
-        return function(text) {
-            // Escape HTML characters while leaving ">" (Markdown
-            // quote syntax) intact, then parse with Markdown
-
-            // Text could start with "#1" but that shouldn't make it a header
-            text = text.replace(/^\#\w/g, function(s) {return " " + s;});
-
-            var escapedHtml = (text||"").replace(/&/g, "&amp;").replace(/</g, "&lt;");
-            escapedHtml = escapedHtml.replace(/\n/g, "  \n"); // Improved line break syntax
-            return converter.makeHtml(escapedHtml);
-        }
-    })(),
-
-    makeMarkdownDiv: function(text) {
-        return $DIV().css({
-            "margin-bottom": -10
-        }).append(
-            $DIV().html(G.util.markdownToSafeHtml(text))
-        );
-    },
-
     scaleToFit: function(width, height, boxWidth, boxHeight) {
         // Maintain width:height aspect ratio while fitting
         // the rectangle into a boxWidth x boxHeight box.
@@ -1914,60 +1889,6 @@ G.util = {
             );
         } else {
             return highlightedText;
-        }
-    },
-
-    makeShortenedMarkdownDiv: function(contents, maxLength, maxLines, marginTop) {
-        if (maxLines) {
-            var lineBreakPos = -1;
-            for (var i=0; i<maxLines; i++) {
-                var startIndex;
-                if (lineBreakPos == -1) {
-                    startIndex = 0;
-                } else {
-                    startIndex = lineBreakPos;
-                    while (startIndex < contents.length && contents[startIndex].match(/\s/)) {
-                        startIndex += 1;
-                    }
-                }
-                lineBreakPos = contents.indexOf("\n", startIndex);
-                if (lineBreakPos == -1) {
-                    break;
-                }
-            }
-            if (lineBreakPos >= 0) {
-                var startIndex = lineBreakPos;
-                while (startIndex < contents.length && contents[startIndex].match(/\s/)) {
-                    startIndex += 1;
-                }
-                var nextLineBreakPos = contents.indexOf("\n", startIndex);
-                if (nextLineBreakPos >= 0) {
-                    if (maxLength) {
-                        maxLength = Math.min(maxLength, lineBreakPos);
-                    } else {
-                        maxLength = lineBreakPos;
-                    }
-                }
-            }
-        }
-
-        if (contents.length <= maxLength) {
-            return G.util.makeMarkdownDiv(contents);
-        } else {
-            return G.util.makeShortenedText(
-                G.util.makeMarkdownDiv(
-                    G.util.shortenText(
-                        contents,
-                        maxLength,
-                        null,
-                        false
-                    )
-                ),
-                G.util.makeMarkdownDiv(
-                    contents
-                ),
-                marginTop
-            );
         }
     },
 
@@ -2352,7 +2273,6 @@ $IFRAME = function(src) {
 
 G.colors = {
     "text": "#333",
-    "quixey": "#0461B4",
     "primary": "#0461B4",
     "secondary": "#599FE0",
     "selectedBg": "#EEEEFF",
