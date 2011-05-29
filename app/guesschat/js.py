@@ -77,7 +77,7 @@ def get_js_from_paths(file_paths, include_constants=False, minify=False):
         if cached_modifytime == modifytime:
             return cached['js']
 
-        logging.info('Reloading %s' % jsfilepath)
+        # logging.info('Reloading %s' % jsfilepath)
 
         file_output = StringIO.StringIO()
         file_output.write('/' + '*'*25 + jsfilepath + '*'*25 + '/' + '\n'*5)
