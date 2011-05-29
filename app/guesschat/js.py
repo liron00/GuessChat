@@ -27,7 +27,7 @@ def get_js_file_paths(deb=False):
 
     # Lib
     for libfilename in (
-        'jquery-1.4.2.js' if deb else 'jquery-1.4.2.min.js',
+        'jquery-1.5.1.js' if deb else 'jquery-1.5.1.min.js',
         'jquery-ui.min.js',
         'jquery.json.js',
         'jquery.prettydate.js',

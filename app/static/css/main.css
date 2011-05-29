@@ -1,0 +1,147 @@
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, default;
+    font-size: 12px;
+    margin: 0;
+    color: #333;
+    background-color: #F6F6F6;
+}
+
+.actionlink {
+    cursor: pointer;
+    color: #007E06;
+    text-decoration: none;
+    font-weight: bold;
+}
+a, span.link {
+    cursor: pointer;
+    color: #0461B4;
+    text-decoration: none;
+    font-weight: bold;
+}
+a:hover, .link:hover, .actionlink:hover {
+    text-decoration: underline;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 4px 0;
+}
+
+p {
+    margin: 0 0 12px 0;
+}
+
+.yellowbutton {
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    background: #FED553;
+    background: -moz-linear-gradient(center bottom, #FED24A, #FFEE9A);
+    background: -webkit-gradient(linear, 0% 100%, 0% 0%, from(#fed24a), to(#ffee9a));
+    border: 1px solid #D99E16;
+    cursor: pointer;
+}
+.yellowbutton:active {
+    background: -moz-linear-gradient(center bottom, #FFEE9A, #FED24A);
+    background: -webkit-gradient(linear, 0% 100%, 0% 0%, from(#ffee9a), to(#fed24a));
+}
+
+.greenbutton {
+    background: #487d04;
+    color: #fff;
+    background: #338b06;
+    background: -moz-linear-gradient(center bottom, #66a31d, #b1dd55);
+    background: -webkit-gradient(linear, 0% 100%, 0% 0%, from(#66a31d), to(#b1dd55));
+    font-weight: bold;
+    cursor: pointer;
+}
+/*.greenbutton:active {
+    background: -moz-linear-gradient(center bottom, #b1dd55, #66a31d);
+    background: -webkit-gradient(linear, 0% 100%, 0% 0%, from(#b1dd55), to(#66a31d));
+}*/
+
+.moduleheader {
+    background: #efefef;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    background: -moz-linear-gradient(center bottom, #f0f0f0, #fff);
+    background: -webkit-gradient(linear, 0% 100%, 0% 0%, from(#f0f0f0), to(#fff));
+}
+
+#layout {
+    width: 980px;
+    background: #FFF;
+}
+
+#header {
+    width: 980px;
+    padding-top: 4px;
+    padding-bottom: 8px;
+}
+
+#logo_section {
+    float: left;
+    width: 200px;
+    margin-top: 6px;
+}
+
+#logo_img {
+    border: none;
+    width: 75px;
+    height: 40px;
+}
+
+#search_box {
+    float: left;
+    margin-top: 8px;
+}
+
+#right_of_search {
+    float: left;
+    margin-top: 16px;
+    margin-left: 12px;
+}
+
+#user_status {
+    float: right;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+#content_container {
+    text-align: left;
+}
+
+#footer {
+    border-top: 1px solid #AAA;
+    padding: 16px;
+}
+
+#SocialIcons a, #SocialIcons img {
+    border: none;
+}
+
+.lgrayrwhite {
+    /* IE10 */ 
+    background-image: -ms-linear-gradient(right, #FFFFFF 0%, #F6F6F6 100%);
+
+    /* Mozilla Firefox */ 
+    background-image: -moz-linear-gradient(right, #FFFFFF 0%, #F6F6F6 100%);
+
+    /* Opera */ 
+    background-image: -o-linear-gradient(right, #FFFFFF 0%, #F6F6F6 100%);
+
+    /* Webkit (Safari/Chrome 10) */ 
+    background-image: -webkit-gradient(linear, right top, left top, color-stop(0, #FFFFFF), color-stop(1, #F6F6F6));
+
+    /* Webkit (Chrome 11+) */ 
+    background-image: -webkit-linear-gradient(right, #FFFFFF 0%, #F6F6F6 100%);
+
+    /* Proposed W3C Markup */ 
+    background-image: linear-gradient(right, #FFFFFF 0%, #F6F6F6 100%);
+}
+
+/* Fix IE image resizing */
+img {
+    -ms-interpolation-mode:bicubic;
+}

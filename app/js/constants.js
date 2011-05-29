@@ -1,0 +1,2 @@
+G.processConstants = function() {
+};
