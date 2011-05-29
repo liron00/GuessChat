@@ -29,7 +29,7 @@ class ViewHandler(RequestHandler, Jinja2Mixin):
 
 class JS(ViewHandler):
     def get(self):
-        response = Response(js.get_js())
+        response = Response(js.get_js(minify=False))
         response.headers['Content-Type'] = 'text/javascript'
         return response
 
@@ -47,7 +47,7 @@ class Home(ViewHandler):
 
         return self.tmpl(
             'base.tmpl',
-            contents='yo:%s' % self.app.debug
+            script='home'
         )
 
 class About(ViewHandler):

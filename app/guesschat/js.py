@@ -65,7 +65,7 @@ def get_js_file_paths(deb=False):
 def set_g_constants():
     return 'G.constants = %s;' % json.json_encode(constants.client_constants)
 
-def get_js_from_paths(file_paths, include_constants=False):
+def get_js_from_paths(file_paths, include_constants=False, minify=False):
     output = StringIO.StringIO()
 
     def get_js_file(jsfilepath):
@@ -83,8 +83,10 @@ def get_js_from_paths(file_paths, include_constants=False):
         file_output.write('/' + '*'*25 + jsfilepath + '*'*25 + '/' + '\n'*5)
 
         with open(path) as f:
-            # Minify
-            file_output.write(jsmin.jsmin(f.read()))
+            if minify:
+                file_output.write(jsmin.jsmin(f.read()))
+            else:
+                file_output.write(f.read())
 
         file_output.write('\n'*5)
 
@@ -101,8 +103,8 @@ def get_js_from_paths(file_paths, include_constants=False):
 
     return output.getvalue()
 
-def get_js(include_constants=False):
-    return get_js_from_paths(get_js_file_paths(), include_constants=include_constants)
+def get_js(include_constants=False, minify=True):
+    return get_js_from_paths(get_js_file_paths(), include_constants=include_constants, minify=minify)
 
 def get_constants():
     return set_g_constants() + "G.processConstants();"

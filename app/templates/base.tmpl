@@ -11,12 +11,14 @@
     </head>
 
     <body>
-        <h1><a href="/">GuessChat</a></h1>
+        <div style="padding:12px;border-bottom:1px solid #CCC;">
+            <div style="font-size:24px;font-weight:bold;"><a href="/">GuessChat</a></div>
+        </div>
 
         <div id="static_body">
             {% block static_body %}
-                Welcome. <a href="/about">About</a><br>
-                {{ contents }}
+            <div id="dynamic_body" style="padding:12px;">
+            </div>
             {% endblock %}
         </div>
 
@@ -27,5 +29,12 @@
         {% endblock %}
 
         {{ '\n'.join(script_tags) | safe }}
+
+        <script type="text/javascript">
+            {% if script %}
+                G.page.name = "{{ script }}";
+            {% endif %}
+            $(G.page.onLoad);
+        </script>
     </body>
 </html>
