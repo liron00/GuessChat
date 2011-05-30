@@ -196,6 +196,9 @@ G.defineControl("ChatUI", {
 
                 _this.chatRoom = G.data.ChatRoom.fromServer(data.chatRoom);
 
+                var strangerIds = data.strangerIds;
+                G.log("strangers: ", strangerIds);
+
                 var channel = new goog.appengine.Channel(data.channelToken);
                 var socket = channel.open({
                     "onopen": _this.func(function() {
@@ -215,6 +218,8 @@ G.defineControl("ChatUI", {
                             _this.clearLog();
                             _this.logOfficialMsg("You are now chatting. Say \"hi\"!");
                             _this.chatting = true;
+
+                            G.log("got strangers: ", messageObj.strangerIds);
 
                         } else if (messageObj.kind == "chatmessage") {
                             var chatMessage = G.data.ChatMessage.fromServer(messageObj.chatMessage);

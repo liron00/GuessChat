@@ -3,6 +3,7 @@ from google.appengine.ext import db
 class User(db.Model):
     # key_name: fb_uid
     fb_access_token = db.StringProperty()
+    random = db.FloatProperty()
     add_dt = db.DateTimeProperty(auto_now_add=True)
 
 class ChatRoom(db.Model):

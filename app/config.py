@@ -23,3 +23,7 @@ else:
         'api_key': '3ee8364fa4315a7e3844eff047900a38',
         'api_secret': '6a35fc6901a9943637823cbf88bb7eba'
     }
+
+config['guesschat'] = {
+    'stranger_choice_count': 9
+}

@@ -7,6 +7,7 @@ from tipfyext.jinja2 import Jinja2Mixin
 from tipfy.sessions import SessionMiddleware
 from google.appengine.ext import db
 
+from util import *
 import js
 from guesschat.writing import eventlogging
 

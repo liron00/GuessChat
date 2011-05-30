@@ -1,5 +1,6 @@
 import datetime
 import logging
+import random
 
 from google.appengine.ext import db
 from google.appengine.api import urlfetch, channel
@@ -8,6 +9,7 @@ from tipfy.handler import RequestHandler
 from tipfy.sessions import SessionMiddleware
 from tipfy import json
 
+from util import *
 from guesschat.models import *
 from guesschat.errors import *
 from guesschat.writing import eventlogging
@@ -35,7 +37,8 @@ class PostHandlers(RequestHandler):
 
         user = User.get_or_insert(
             response_obj['id'],
-            fb_access_token=fb_access_token
+            fb_access_token=fb_access_token,
+            random=random.random()
         )
         self.session['fb_uid'] = response_obj['id']
 
@@ -50,13 +53,31 @@ class PostHandlers(RequestHandler):
             chatroom.put()
 
             ready_chatroom = None
+
+            stranger_uids = get_random_uids(
+                self.app.config['guesschat']['stranger_choice_count'] - 1,
+                exclude=[user_key.name() for user_key in chatroom.users]
+            )
+
+            # Make random UIDs list relative to foreign chatter
+            foreign_stranger_uids = list(stranger_uids)
+            foreign_stranger_uids.insert(
+                random.randint(0, len(stranger_uids)), self.session['fb_uid']
+            )
+
+            # Make random UIDs list relative to local chatter
+            stranger_uids.insert(
+                random.randint(0, len(stranger_uids)), chatroom.users[0].name()
+            )
+
             matched = True
 
             other_client_id = '%s_%s' % (
                 chatroom.key().id(), chatroom.users[0].name()
             )
             channel_send(other_client_id, {
-                'kind': 'partner_joined'
+                'kind': 'partner_joined',
+                'strangerIds': foreign_stranger_uids
             })
 
         else:
@@ -66,6 +87,7 @@ class PostHandlers(RequestHandler):
             chatroom.put()
             ready_chatroom = chatroom
 
+            stranger_uids = None
             matched = False
 
         client_id = '%s_%s' % (
@@ -78,6 +100,7 @@ class PostHandlers(RequestHandler):
         return {
             'chatRoom': to_client.chatroom(chatroom),
             'channelToken': channel_token,
+            'strangerIds': stranger_uids,
             'matched': matched
         }
 
