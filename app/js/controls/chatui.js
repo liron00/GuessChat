@@ -11,7 +11,8 @@ G.defineControl("ChatUI", {
             "inputBox": new G.controls.TextBox().set({
                 "big": true,
                 "elastic": false,
-                "trim": false
+                "trim": false,
+                "maxLength": 500
             }).style({
                 "text": {
                     "padding": 0,
@@ -58,6 +59,8 @@ G.defineControl("ChatUI", {
                         "border": "1px solid #CCC",
                         "padding": 12,
                         "height": _this.style.logHeight,
+                        "word-wrap": "break-word",
+                        "overflow": "auto",
                         "width": _this.style.width
                     }).append(
                     ),

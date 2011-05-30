@@ -32,19 +32,18 @@ G.definePage("home", function() {
     );
 
     var enter = function() {
-        FB.getLoginStatus(function(response) {
-            if (response.session) {
-                startChat();
-            } else {
-                FB.login(function(response) {
-                    if (response.session) {
-                        startChat();
-                    } else {
-                        // Cancelled FB login
-                    }
-                });
-            }
-        });
+        var fbSession = FB.getSession();
+        if (fbSession) {
+            startChat();
+        } else {
+            FB.login(function(response) {
+                if (response.session) {
+                    startChat();
+                } else {
+                    // Cancelled FB login
+                }
+            });
+        }
     };
 
     var chatUI;
