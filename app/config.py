@@ -2,6 +2,11 @@ import os
 
 config = {}
 
+config['tipfy.sessions'] = {
+    'secret_key': 'kdnMcdrVOwVDRc6xcQai',
+    'default_backend': 'securecookie'
+}
+
 config['env'] = {
     'is_live': not os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
 }

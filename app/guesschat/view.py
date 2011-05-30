@@ -4,12 +4,15 @@ logging.getLogger().setLevel(logging.DEBUG)
 from tipfy.app import Response
 from tipfy.handler import RequestHandler
 from tipfyext.jinja2 import Jinja2Mixin
+from tipfy.sessions import SessionMiddleware
 from google.appengine.ext import db
 
 import js
 from guesschat.writing import eventlogging
 
 class ViewHandler(RequestHandler, Jinja2Mixin):
+    middleware = [SessionMiddleware()]
+
     def tmpl(self, path, **context):
         params = dict(context)
 
@@ -23,6 +26,7 @@ class ViewHandler(RequestHandler, Jinja2Mixin):
         return self.render_response(path, **params)
 
     def log_event(self, name, **properties):
+        properties['fb_uid'] = self.session.get('fb_uid')
         properties['ip_address'] = self.request.remote_addr
         properties['path'] = self.request.path
 

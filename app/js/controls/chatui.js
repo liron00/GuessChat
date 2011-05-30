@@ -115,13 +115,22 @@ G.defineControl("ChatUI", {
         );
 
         var fbSession = FB.getSession();
-        G.get(
+        G.post(
             "start_chat",
             {
                 "fb_uid": fbSession.uid,
                 "fb_access_token": fbSession.access_token
             },
             _this.func(function(data) {
+                if (data.rc) {
+                    _this.logMsg(
+                        $DIV().css({
+                            "font-weight": "bold",
+                            "color": "red"
+                        }).text("Error connecting to chat server.")
+                    );
+                    return;
+                }
             })
         );
     }
