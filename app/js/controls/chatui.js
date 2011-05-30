@@ -21,9 +21,7 @@ G.defineControl("ChatUI", {
                 }
             }).bind({
                 "enterDown": _this.func(function() {
-                    setTimeout(_this.func(function() {
-                        _this.sendMessage();
-                    }), 1);
+                    _this.sendMessage();
                     return false;
                 })
             }),
@@ -117,6 +115,7 @@ G.defineControl("ChatUI", {
                     "margin-bottom": 8
                 });
                 elems.logBox.append(msgDiv);
+                elems.logBox[0].scrollTop = elems.logBox[0].scrollHeight;
             }
         });
     },

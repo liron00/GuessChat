@@ -163,16 +163,16 @@ G.defineControl("TextBox", {
             }
 
             _this._handleInputTextChange(
-                _this._promptDestroyed? $(this).val() : ""
+                _this._promptDestroyed? this.value : ""
             );
 
         })).bind("change", _this.func(function() {
-            _this._handleInputTextChange($(this).val());
+            _this._handleInputTextChange(this.value);
 
         })).bind("paste", _this.func(function() {
             // The textbox value hasn't updated yet
             setTimeout(_this.func(function() {
-                _this._handleInputTextChange(elems.inputText.val());
+                _this._handleInputTextChange(elems.inputText[0].value);
             }), 1);
 
         })).bind("focus", _this.func(function() {
