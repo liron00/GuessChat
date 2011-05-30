@@ -4,7 +4,8 @@ G.defineControl("ChatUI", {
         _this.createFields({
             "socket": null,
             "chatRoom": null,
-            "chatting": false
+            "chatting": false,
+            "strangerIds": null
         });
 
         _this.createField("controls", {
@@ -35,7 +36,9 @@ G.defineControl("ChatUI", {
                 "text": "Send"
             }).bind({
                 "click": _this.sendMessage
-            })
+            }),
+
+            "strangerSelector": null
         });
 
         _this.style({
@@ -53,6 +56,7 @@ G.defineControl("ChatUI", {
         _this.domRoot.append(
             G.util.makeTable([
                 $TD().css({
+                    "vertical-align": "top",
                     "padding-right": 20
                 }).append(
                     elems.logBox = $DIV().css({
@@ -95,9 +99,10 @@ G.defineControl("ChatUI", {
                     })
                 ),
                 $TD().css({
+                    "vertical-align": "top",
                     "width": 250
                 }).append(
-
+                    elems.strangerSection = $DIV()
                 )
             ]).css({
                 "width": "100%"
@@ -116,6 +121,48 @@ G.defineControl("ChatUI", {
                 });
                 elems.logBox.append(msgDiv);
                 elems.logBox[0].scrollTop = elems.logBox[0].scrollHeight;
+            },
+
+            "strangers": function() {
+                var strangerOptions = $.map(_this.strangerIds, function(strangerId) {
+                    return {
+                        "text": G.util.$IMG("http://graph.facebook.com/" + strangerId + "/picture?type=square").css({
+                            "cursor": "pointer"
+                        }),
+                        "value": strangerId
+                    };
+                });
+
+                _this.controls.strangerSelector = new G.controls.RadioSelector(strangerOptions).set({
+                    "rowSize": 3,
+                    "showButtons": false
+                }).style({
+                    "normalBgStyle": {
+                        "padding": 8,
+                        "border": "",
+                        "background": ""
+                    },
+                    "selectedBgStyle": {
+                        "padding": 4,
+                        "border": "4px solid green",
+                        "background": G.colors.highlight
+                    }
+                });
+
+                elems.strangerSection.empty().append(
+                    $DIV().css({
+                        "text-align": "center",
+                        "font-size": 14,
+                        "font-weight": "bold",
+                        "padding-bottom": 4,
+                        "color": "#666",
+                        "border-bottom": "1px dotted #CCC",
+                        "margin-bottom": 8
+                    }).text("Your Guess"),
+                    _this.controls.strangerSelector.renderHere().css({
+                        "margin-bottom": 8
+                    })
+                );
             }
         });
     },
@@ -196,9 +243,6 @@ G.defineControl("ChatUI", {
 
                 _this.chatRoom = G.data.ChatRoom.fromServer(data.chatRoom);
 
-                var strangerIds = data.strangerIds;
-                G.log("strangers: ", strangerIds);
-
                 var channel = new goog.appengine.Channel(data.channelToken);
                 var socket = channel.open({
                     "onopen": _this.func(function() {
@@ -206,6 +250,10 @@ G.defineControl("ChatUI", {
                             _this.clearLog();
                             _this.logOfficialMsg("You are now chatting. Say \"hi\"!");
                             _this.chatting = true;
+
+                            _this.strangerIds = data.strangerIds;
+                            _this.render("strangers");
+
                         } else {
                             _this.logOfficialMsg("Waiting for a chat partner...");
                         }
@@ -219,7 +267,8 @@ G.defineControl("ChatUI", {
                             _this.logOfficialMsg("You are now chatting. Say \"hi\"!");
                             _this.chatting = true;
 
-                            G.log("got strangers: ", messageObj.strangerIds);
+                            _this.strangerIds = messageObj.strangerIds;
+                            _this.render("strangers");
 
                         } else if (messageObj.kind == "chatmessage") {
                             var chatMessage = G.data.ChatMessage.fromServer(messageObj.chatMessage);
