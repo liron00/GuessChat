@@ -10,7 +10,7 @@ from tipfy import json
 from guesschat.models import *
 from guesschat.errors import *
 from guesschat.writing import eventlogging
-from guesschat.client import to_client
+from guesschat.client import to_client, from_client
 
 ready_chatroom = None
 
@@ -52,7 +52,7 @@ class PostHandlers(RequestHandler):
             matched = True
 
             other_client_id = '%s_%s' % (
-                chatroom.key().name(), chatroom.users[0].name()
+                chatroom.key().id(), chatroom.users[0].name()
             )
             channel_send(other_client_id, {
                 'kind': 'partner_joined'
@@ -68,7 +68,7 @@ class PostHandlers(RequestHandler):
             matched = False
 
         client_id = '%s_%s' % (
-            chatroom.key().name(), user.key().name()
+            chatroom.key().id(), user.key().name()
         )
         channel_token = channel.create_channel(client_id)
 
@@ -79,6 +79,32 @@ class PostHandlers(RequestHandler):
             'channelToken': channel_token,
             'matched': matched
         }
+
+    def send_chatmessage(self, chatmessage):
+        fb_uid = self.session.get('fb_uid')
+        assert fb_uid, 'No user'
+
+        chatmessage = from_client.chatmessage(chatmessage, User(key_name=fb_uid))
+
+        if not chatmessage.chatroom:
+            raise Error('Missing or invalid chatroom')
+        elif not any(user_key.name() == fb_uid for user_key in chatmessage.chatroom.users):
+            raise Error('You are not in this chatroom.')
+        elif chatmessage.chatroom.end_dt:
+            raise Error('Chat has ended.')
+
+        chatmessage.put()
+
+        # Send the message on the other users' channels
+        for user_key in chatmessage.chatroom.users:
+            if user_key.name() != fb_uid:
+                client_id = '%s_%s' % (
+                    chatmessage.chatroom.key().id(), user_key.name()
+                )
+                channel_send(client_id, {
+                    'kind': 'chatmessage',
+                    'chatMessage': to_client.chatmessage(chatmessage)
+                })
 
 class Ajax(GetHandlers, PostHandlers):
     middleware = [SessionMiddleware()]

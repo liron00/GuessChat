@@ -1,19 +1,28 @@
 G.defineControl("ChatUI", {
     _init: function() {
+        // State
         _this.createFields({
-            "socket": null
+            "socket": null,
+            "chatRoom": null,
+            "chatting": false
         });
 
         _this.createField("controls", {
             "inputBox": new G.controls.TextBox().set({
                 "big": true,
-                "elastic": false
+                "elastic": false,
+                "trim": false
             }).style({
                 "text": {
                     "padding": 0,
                     "border": 0,
                     "width": "100%"
                 }
+            }).bind({
+                "enterDown": _this.func(function() {
+                    _this.sendMessage();
+                    return false;
+                })
             }),
 
             "disconnectButton": new G.controls.Button().set({
@@ -111,6 +120,30 @@ G.defineControl("ChatUI", {
         _this.render("logMsg", msgContents);
     },
 
+    logChatMessage: function(chatMessage) {
+        if (chatMessage.userId == FB.getSession().uid) {
+            _this.logMsg(
+                $DIV().append(
+                    $SPAN().css({
+                        "color": "blue",
+                        "font-weight": "bold"
+                    }).text("You: "),
+                    $SPAN().text(chatMessage.text)
+                )
+            );
+        } else {
+            _this.logMsg(
+                $DIV().append(
+                    $SPAN().css({
+                        "color": "red",
+                        "font-weight": "bold"
+                    }).text("Stranger: "),
+                    $SPAN().text(chatMessage.text)
+                )
+            );
+        }
+    },
+
     logOfficialMsg: function(text) {
         _this.logMsg(
             $DIV().css({
@@ -157,12 +190,15 @@ G.defineControl("ChatUI", {
                     return;
                 }
 
+                _this.chatRoom = G.data.ChatRoom.fromServer(data.chatRoom);
+
                 var channel = new goog.appengine.Channel(data.channelToken);
                 var socket = channel.open({
                     "onopen": _this.func(function() {
                         if (data.matched) {
                             _this.clearLog();
                             _this.logOfficialMsg("You are now chatting. Say \"hi\"!");
+                            _this.chatting = true;
                         } else {
                             _this.logOfficialMsg("Waiting for a chat partner...");
                         }
@@ -174,9 +210,11 @@ G.defineControl("ChatUI", {
                         if (messageObj.kind == "partner_joined") {
                             _this.clearLog();
                             _this.logOfficialMsg("You are now chatting. Say \"hi\"!");
+                            _this.chatting = true;
 
                         } else if (messageObj.kind == "chatmessage") {
-                            _this.logMsg(messageObj.text);
+                            var chatMessage = G.data.ChatMessage.fromServer(messageObj.chatMessage);
+                            _this.logChatMessage(chatMessage);
                         }
                     }),
 
@@ -187,6 +225,7 @@ G.defineControl("ChatUI", {
                     "onclose": _this.func(function() {
                         if (_this.socket == socket) {
                             G.log("Unexpected socket close.");
+                            _this.chatting = false;
                         }
                     })
                 });
@@ -205,24 +244,35 @@ G.defineControl("ChatUI", {
 
         socket.close();
         _this.logOfficialMsg("Disconnected.");
+        _this.chatting = false;
     },
 
     sendMessage: function() {
+        if (!_this.chatting) {
+            return;
+        }
+
+        G.assert(_this.chatRoom && _this.chatRoom.id, "No chat room");
+
         var text = _this.controls.inputBox.text;
         if (!text) {
             return;
         }
 
         var chatMessage = new G.data.ChatMessage({
+            "userId": FB.getSession().uid,
+            "chatroomId": _this.chatRoom.id,
             "text": text
         });
 
         G.post(
             "send_chatmessage",
             {
-                "chatroom": _this.chatroom,
                 "chatmessage": chatMessage
             }
         );
+
+        _this.controls.inputBox.setText("");
+        _this.logChatMessage(chatMessage);
     }
 });

@@ -70,6 +70,7 @@ G.defineControl("TextBox", {
 
         _this.createEvents(
             "change", "keyDown", "focus", "blur",
+            "enterDown",
             "pressEnter", "pressLeft", "pressRight", "pressUp", "pressDown",
             "pressBackspace", "pressEscape",
             "pressNormal",
@@ -132,6 +133,7 @@ G.defineControl("TextBox", {
             _this.trigger("keyDown", e);
 
             if (e.keyCode == 13) {
+                return _this.trigger("enterDown");
                 // When this key comes up, we'll trigger a pressEnter
                 // (but doing so now would cut off text input)
             } else if (e.keyCode == 37) {
