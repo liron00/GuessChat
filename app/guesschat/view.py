@@ -1,4 +1,5 @@
 import logging
+logging.getLogger().setLevel(logging.DEBUG)
 
 from tipfy.app import Response
 from tipfy.handler import RequestHandler

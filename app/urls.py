@@ -7,5 +7,9 @@ rules = [
 
         Rule('/', name='home', handler='Home'),
         Rule('/about', name='about', handler='About')
+    ]),
+
+    HandlerPrefix('guesschat.ajax.', [
+        Rule('/ajax/<method>', name='ajax', handler='Ajax')
     ])
 ]
