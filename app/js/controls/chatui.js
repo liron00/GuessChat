@@ -219,6 +219,10 @@ G.defineControl("ChatUI", {
                         } else if (messageObj.kind == "chatmessage") {
                             var chatMessage = G.data.ChatMessage.fromServer(messageObj.chatMessage);
                             _this.logChatMessage(chatMessage);
+
+                        } else if (messageObj.kind == "disconnect") {
+                            _this.logOfficialMsg("Your partner has disconnected.");
+                            _this.handleDisconnect();
                         }
                     }),
 
@@ -239,6 +243,17 @@ G.defineControl("ChatUI", {
     },
 
     disconnect: function() {
+        G.post(
+            "disconnect",
+            {
+                "chatroom_id": _this.chatRoom.id
+            }
+        );
+        _this.handleDisconnect();
+        _this.logOfficialMsg("You have disconnected.");
+    },
+
+    handleDisconnect: function() {
         if (!_this.socket) {
             return;
         }
@@ -247,7 +262,10 @@ G.defineControl("ChatUI", {
         _this.socket = null;
 
         socket.close();
-        _this.logOfficialMsg("Disconnected.");
+
+        _this.controls.disconnectButton.disable();
+        _this.controls.sendButton.disable();
+
         _this.chatting = false;
     },
 

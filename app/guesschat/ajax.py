@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from google.appengine.ext import db
@@ -107,6 +108,31 @@ class PostHandlers(RequestHandler):
                 channel_send(client_id, {
                     'kind': 'chatmessage',
                     'chatMessage': secret_chatmessage_data
+                })
+
+    def disconnect(self, chatroom_id):
+        fb_uid = self.session.get('fb_uid')
+        assert fb_uid, 'No user'
+
+        chatroom = ChatRoom.get_by_id(chatroom_id)
+        if not chatroom:
+            raise Error('Invalid chatroom')
+        elif chatroom.end_dt:
+            raise Error('Chatroom already ended.')
+
+        chatroom.ender = db.Key.from_path('User', fb_uid)
+        chatroom.end_type = 1 # Explicitly disconnected
+        chatroom.end_dt = datetime.datetime.now()
+        chatroom.put()
+
+        for user_key in chatroom.users:
+            if user_key.name() != fb_uid:
+                client_id = '%s_%s' % (
+                    chatroom.key().id(), user_key.name()
+                )
+                channel_send(client_id, {
+                    'kind': 'disconnect',
+                    'end_type': 1
                 })
 
 class Ajax(GetHandlers, PostHandlers):
