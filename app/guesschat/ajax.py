@@ -1,7 +1,7 @@
 import logging
 
 from google.appengine.ext import db
-from google.appengine.api import urlfetch
+from google.appengine.api import urlfetch, channel
 from tipfy.app import Response
 from tipfy.handler import RequestHandler
 from tipfy.sessions import SessionMiddleware
@@ -11,13 +11,15 @@ from guesschat.models import *
 from guesschat.errors import *
 from guesschat.writing import eventlogging
 
-waiter = None # User waiting to start chat
+ready_chatroom = None
 
 class GetHandlers(RequestHandler):
     pass
 
 class PostHandlers(RequestHandler):
     def start_chat(self, fb_uid, fb_access_token):
+        global ready_chatroom
+
         # Verify that fb_uid is accurate by testing its access token
         response = urlfetch.fetch(
             'https://graph.facebook.com/%s?access_token=%s' % (fb_uid, fb_access_token)
@@ -34,8 +36,39 @@ class PostHandlers(RequestHandler):
         )
         self.session['fb_uid'] = response_obj['id']
 
-        self.log_event('start chat')
+        if ready_chatroom:
+            chatroom = ready_chatroom
+            chatroom.users.append(user.key())
+            chatroom.put()
 
+            ready_chatroom = None
+            matched = True
+
+            other_client_id = '%s_%s' % (
+                chatroom.key().id(), chatroom.users[0].id()
+            )
+            channel.send_message(other_client_id, 'gotime')
+
+        else:
+            chatroom = ChatRoom(
+                users = [user.key()]
+            )
+            chatroom.put()
+            ready_chatroom = chatroom
+
+            matched = False
+
+        client_id = '%s_%s' % (
+            chatroom.key().id(), user.key().id()
+        )
+        channel_token = channel.create_channel(client_id)
+
+        self.log_event('start chat', matched=matched)
+
+        return {
+            'channelToken': channel_token,
+            'matched': matched
+        }
 
 class Ajax(GetHandlers, PostHandlers):
     middleware = [SessionMiddleware()]

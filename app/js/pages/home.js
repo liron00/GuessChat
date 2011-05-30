@@ -61,5 +61,6 @@ G.definePage("home", function() {
         );
 
         chatUI.requestNewChat();
+        chatUI.focus();
     };
 });

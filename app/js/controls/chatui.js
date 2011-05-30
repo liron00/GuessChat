@@ -106,12 +106,35 @@ G.defineControl("ChatUI", {
         _this.render("logMsg", msgContents);
     },
 
-    requestNewChat: function() {
-        _this.render("clearLog");
+    logOfficialMsg: function(text) {
         _this.logMsg(
             $DIV().css({
                 "font-weight": "bold"
-            }).text("Connecting to server...")
+            }).text(text)
+        );
+    },
+
+    logErrorMsg: function(text) {
+        _this.logMsg(
+            $DIV().css({
+                "font-weight": "bold",
+                "color": "red"
+            }).text(text)
+        );
+    },
+
+    clearLog: function() {
+        _this.render("clearLog");
+    },
+
+    focus: function() {
+        _this.controls.inputBox.focus();
+    },
+
+    requestNewChat: function() {
+        _this.clearLog();
+        _this.logOfficialMsg(
+            "Connecting to server..."
         );
 
         var fbSession = FB.getSession();
@@ -123,14 +146,35 @@ G.defineControl("ChatUI", {
             },
             _this.func(function(data) {
                 if (data.rc) {
-                    _this.logMsg(
-                        $DIV().css({
-                            "font-weight": "bold",
-                            "color": "red"
-                        }).text("Error connecting to chat server.")
+                    _this.logErrorMsg(
+                        "Error connecting to chat server."
                     );
                     return;
                 }
+
+                var channel = new goog.appengine.Channel(data.channelToken);
+                var socket = channel.open({
+                    "onopen": _this.func(function() {
+                        if (data.matched) {
+                            _this.clearLog();
+                            _this.logOfficialMsg("You are now chatting. Say \"hi\"!");
+                        } else {
+                            _this.logOfficialMsg("Waiting for a chat partner...");
+                        }
+                    }),
+
+                    "onmessage": _this.func(function(message) {
+                        console.log("Message: ", message);
+                    }),
+
+                    "onerror": _this.func(function(err) {
+                        _this.logErrorMsg(err.description);
+                    }),
+
+                    "onclose": _this.func(function() {
+                        _this.logOfficialMsg("Disconnected.");
+                    })
+                });
             })
         );
     }

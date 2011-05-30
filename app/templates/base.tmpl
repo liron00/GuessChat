@@ -28,8 +28,8 @@
         </div>
         {% endblock %}
 
+        <script type="text/javascript" src="/_ah/channel/jsapi"></script>
         {{ '\n'.join(script_tags) | safe }}
-
         <script type="text/javascript">
             {% if script %}
                 G.page.name = "{{ script }}";
