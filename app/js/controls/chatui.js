@@ -12,7 +12,20 @@ G.defineControl("ChatUI", {
         var elems = _this.domElems;
 
         _this.domRoot.append(
-            _this.controls.chatBox.renderHere()
+            G.util.makeTable([
+                $TD().css({
+                }).append(
+                    _this.controls.chatBox.renderHere().css({
+                        "margin-right": 20
+                    })
+                ),
+                $TD().css({
+                    "width": 250
+                }).append(
+                )
+            ]).css({
+                "width": "100%"
+            })
         );
     }
 });
