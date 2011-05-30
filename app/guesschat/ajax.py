@@ -10,8 +10,12 @@ from tipfy import json
 from guesschat.models import *
 from guesschat.errors import *
 from guesschat.writing import eventlogging
+from guesschat.client import to_client
 
 ready_chatroom = None
+
+def channel_send(client_id, message_obj):
+    channel.send_message(client_id, json.json_encode(message_obj))
 
 class GetHandlers(RequestHandler):
     pass
@@ -27,14 +31,17 @@ class PostHandlers(RequestHandler):
         response_obj = json.json_decode(response.content)
         if 'error' in response_obj:
             raise BadAccessTokenError()
-        elif 'username' not in response_obj:
-            raise Error('FB graph node is not a user')
 
         user = User.get_or_insert(
             response_obj['id'],
             fb_access_token=fb_access_token
         )
         self.session['fb_uid'] = response_obj['id']
+
+        if ready_chatroom and ready_chatroom.users[0].name() == user.key().name():
+             # If user starts two chatrooms in a row,
+             # forget about the old one (leave it forever unjoined)
+            ready_chatroom = None
 
         if ready_chatroom:
             chatroom = ready_chatroom
@@ -45,9 +52,11 @@ class PostHandlers(RequestHandler):
             matched = True
 
             other_client_id = '%s_%s' % (
-                chatroom.key().id(), chatroom.users[0].id()
+                chatroom.key().name(), chatroom.users[0].name()
             )
-            channel.send_message(other_client_id, 'gotime')
+            channel_send(other_client_id, {
+                'kind': 'partner_joined'
+            })
 
         else:
             chatroom = ChatRoom(
@@ -59,13 +68,14 @@ class PostHandlers(RequestHandler):
             matched = False
 
         client_id = '%s_%s' % (
-            chatroom.key().id(), user.key().id()
+            chatroom.key().name(), user.key().name()
         )
         channel_token = channel.create_channel(client_id)
 
         self.log_event('start chat', matched=matched)
 
         return {
+            'chatRoom': to_client.chatroom(chatroom),
             'channelToken': channel_token,
             'matched': matched
         }

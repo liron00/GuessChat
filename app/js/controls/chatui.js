@@ -1,6 +1,7 @@
 G.defineControl("ChatUI", {
     _init: function() {
         _this.createFields({
+            "socket": null
         });
 
         _this.createField("controls", {
@@ -17,9 +18,13 @@ G.defineControl("ChatUI", {
 
             "disconnectButton": new G.controls.Button().set({
                 "text": "Disconnect"
+            }).bind({
+                "click": _this.disconnect
             }),
             "sendButton": new G.controls.Button().set({
                 "text": "Send"
+            }).bind({
+                "click": _this.sendMessage
             })
         });
 
@@ -147,7 +152,7 @@ G.defineControl("ChatUI", {
             _this.func(function(data) {
                 if (data.rc) {
                     _this.logErrorMsg(
-                        "Error connecting to chat server."
+                        data.msg
                     );
                     return;
                 }
@@ -163,8 +168,16 @@ G.defineControl("ChatUI", {
                         }
                     }),
 
-                    "onmessage": _this.func(function(message) {
-                        console.log("Message: ", message);
+                    "onmessage": _this.func(function(m) {
+                        var messageObj = $.fromJSON(m.data);
+
+                        if (messageObj.kind == "partner_joined") {
+                            _this.clearLog();
+                            _this.logOfficialMsg("You are now chatting. Say \"hi\"!");
+
+                        } else if (messageObj.kind == "chatmessage") {
+                            _this.logMsg(messageObj.text);
+                        }
                     }),
 
                     "onerror": _this.func(function(err) {
@@ -172,10 +185,44 @@ G.defineControl("ChatUI", {
                     }),
 
                     "onclose": _this.func(function() {
-                        _this.logOfficialMsg("Disconnected.");
+                        if (_this.socket == socket) {
+                            G.log("Unexpected socket close.");
+                        }
                     })
                 });
+                _this.socket = socket;
             })
+        );
+    },
+
+    disconnect: function() {
+        if (!_this.socket) {
+            return;
+        }
+
+        var socket = _this.socket;
+        _this.socket = null;
+
+        socket.close();
+        _this.logOfficialMsg("Disconnected.");
+    },
+
+    sendMessage: function() {
+        var text = _this.controls.inputBox.text;
+        if (!text) {
+            return;
+        }
+
+        var chatMessage = new G.data.ChatMessage({
+            "text": text
+        });
+
+        G.post(
+            "send_chatmessage",
+            {
+                "chatroom": _this.chatroom,
+                "chatmessage": chatMessage
+            }
         );
     }
 });

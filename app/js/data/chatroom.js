@@ -1,4 +1,4 @@
-G.defineData("User", {
+G.defineData("ChatRoom", {
     _init: function(fromServer) {
         _this.createFields({
             "id": Number()

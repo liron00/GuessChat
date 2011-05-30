@@ -12,5 +12,11 @@ class ChatRoom(db.Model):
     end_dt = db.DateTimeProperty()
     add_dt = db.DateTimeProperty(auto_now_add=True)
 
+class ChatMessage(db.Model):
+    chatroom = db.ReferenceProperty(ChatRoom)
+    user = db.ReferenceProperty(User)
+    text = db.StringProperty()
+    add_dt = db.DateTimeProperty(auto_now_add=True)
+
 class EventLog(db.Expando):
     name = db.StringProperty()

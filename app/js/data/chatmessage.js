@@ -1,4 +1,4 @@
-G.defineData("User", {
+G.defineData("ChatMessage", {
     _init: function(fromServer) {
         _this.createFields({
             "id": Number()
@@ -7,7 +7,9 @@ G.defineData("User", {
 
     _fromServer: function(data) {
         _this.set({
-            "id": data.id
+            "id": data.id,
+            "userId": data.userId,
+            "text": data.text
         });
     }
 });
