@@ -21,7 +21,9 @@ G.defineControl("ChatUI", {
                 }
             }).bind({
                 "enterDown": _this.func(function() {
-                    _this.sendMessage();
+                    setTimeout(_this.func(function() {
+                        _this.sendMessage();
+                    }), 1);
                     return false;
                 })
             }),
