@@ -13,7 +13,7 @@ def chatmessage(chatmessage):
     return {
         'className': 'ChatMessage',
         'id': chatmessage.key().id(),
-        'userId': chatmessage.user.key().id(),
+        'userId': chatmessage.user.key().name(),
         'text': chatmessage.text
     }
 

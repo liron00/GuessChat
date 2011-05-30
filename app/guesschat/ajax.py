@@ -97,13 +97,16 @@ class PostHandlers(RequestHandler):
 
         # Send the message on the other users' channels
         for user_key in chatmessage.chatroom.users:
+            secret_chatmessage_data = to_client.chatmessage(chatmessage)
+            secret_chatmessage_data['userId'] = None # Strip out the userId
+
             if user_key.name() != fb_uid:
                 client_id = '%s_%s' % (
                     chatmessage.chatroom.key().id(), user_key.name()
                 )
                 channel_send(client_id, {
                     'kind': 'chatmessage',
-                    'chatMessage': to_client.chatmessage(chatmessage)
+                    'chatMessage': secret_chatmessage_data
                 })
 
 class Ajax(GetHandlers, PostHandlers):
