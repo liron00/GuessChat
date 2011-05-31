@@ -135,10 +135,6 @@ G.defineControl("ChatUI", {
             },
 
             "logMsg": function(msgContents) {
-                if (elems.typing) {
-                    elems.typing.remove();
-                }
-
                 var msgDiv = G.util.makeDiv(msgContents);
                 msgDiv.css({
                     "margin-bottom": 8
@@ -261,6 +257,10 @@ G.defineControl("ChatUI", {
                 )
             );
         } else {
+            if (_this.domElems.typing) {
+                _this.domElems.typing.remove();
+            }
+
             _this.logMsg(
                 $DIV().append(
                     $SPAN().css({
