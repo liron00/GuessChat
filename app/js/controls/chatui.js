@@ -48,6 +48,8 @@ G.defineControl("ChatUI", {
             "buttonWidth": 150,
             "width": null
         });
+
+        _this.createEvents("chatEnded");
     },
 
     _render: function() {
@@ -147,6 +149,16 @@ G.defineControl("ChatUI", {
                         "border": "4px solid green",
                         "background": G.colors.highlight
                     }
+                }).bind({
+                    "select": _this.func(function(strangerId) {
+                        G.post(
+                            "guess",
+                            {
+                                "chatroom_id": _this.chatRoom.id,
+                                "stranger_id": strangerId
+                            }
+                        );
+                    })
                 });
 
                 elems.strangerSection.empty().append(
@@ -277,6 +289,7 @@ G.defineControl("ChatUI", {
                         } else if (messageObj.kind == "disconnect") {
                             _this.logOfficialMsg("Your partner has disconnected.");
                             _this.handleDisconnect();
+                            _this.trigger("chatEnded", messageObj);
                         }
                     }),
 
@@ -301,7 +314,10 @@ G.defineControl("ChatUI", {
             "disconnect",
             {
                 "chatroom_id": _this.chatRoom.id
-            }
+            },
+            _this.func(function(data) {
+                _this.trigger("chatEnded", data);
+            })
         );
         _this.handleDisconnect();
         _this.logOfficialMsg("You have disconnected.");

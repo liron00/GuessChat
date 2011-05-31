@@ -19,5 +19,13 @@ class ChatMessage(db.Model):
     text = db.StringProperty()
     add_dt = db.DateTimeProperty(auto_now_add=True)
 
+class ChatGuess(db.Model):
+    # key_name: '[chatroom id]_[user key name]'
+    chatroom = db.ReferenceProperty(ChatRoom)
+    user = db.ReferenceProperty(User)
+    guess = db.ReferenceProperty(User, collection_name='chatguess_target_set')
+    correct = db.BooleanProperty()
+    add_dt = db.DateTimeProperty(auto_now_add=True)
+
 class EventLog(db.Expando):
     name = db.StringProperty()

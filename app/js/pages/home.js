@@ -47,13 +47,18 @@ G.definePage("home", function() {
     };
 
     var chatUI;
+    var endingUI;
 
     var startChat = function() {
         var fbSession = FB.getSession();
 
         elems.homeSection.hide();
 
-        chatUI = new G.controls.ChatUI();
+        chatUI = new G.controls.ChatUI().bind({
+            "chatEnded": function(endingData) {
+                G.log("ending data: ", endingData);
+            }
+        });
 
         elems.chatSection.show().append(
             chatUI.renderHere()

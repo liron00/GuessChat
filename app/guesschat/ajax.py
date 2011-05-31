@@ -133,6 +133,34 @@ class PostHandlers(RequestHandler):
                     'chatMessage': secret_chatmessage_data
                 })
 
+    def guess(self, chatroom_id, stranger_id):
+        fb_uid = self.session.get('fb_uid')
+        assert fb_uid, 'No user'
+
+        assert stranger_id, 'No stranger id'
+
+        chatroom = ChatRoom.get_by_id(chatroom_id)
+        if not chatroom:
+            raise Error('Invalid chatroom')
+        elif not any(user_key.name() == fb_uid for user_key in chatroom.users):
+            raise Error('You are not in this chatroom.')
+        elif chatroom.end_dt:
+            raise Error('Chat has ended.')
+
+        correct = False
+        for user_key in chatroom.users:
+            if user_key.name() != fb_uid and user_key.name() == stranger_id:
+                correct = True
+
+        chatguess = ChatGuess(
+            key_name='%s_%s' % (chatroom.key().id(), fb_uid),
+            chatroom=chatroom,
+            user=db.Key.from_path('User', fb_uid),
+            guess=db.Key.from_path('User', stranger_id),
+            correct=correct
+        )
+        chatguess.put()
+
     def disconnect(self, chatroom_id):
         fb_uid = self.session.get('fb_uid')
         assert fb_uid, 'No user'
@@ -140,13 +168,28 @@ class PostHandlers(RequestHandler):
         chatroom = ChatRoom.get_by_id(chatroom_id)
         if not chatroom:
             raise Error('Invalid chatroom')
+        elif not any(user_key.name() == fb_uid for user_key in chatroom.users):
+            raise Error('You are not in this chatroom.')
         elif chatroom.end_dt:
-            raise Error('Chatroom already ended.')
+            raise Error('Chat already ended.')
 
         chatroom.ender = db.Key.from_path('User', fb_uid)
         chatroom.end_type = 1 # Explicitly disconnected
         chatroom.end_dt = datetime.datetime.now()
         chatroom.put()
+
+        local_guess_uid = None
+        local_guess_correct = False
+        foreign_guess_uid = None
+        foreign_guess_correct = False
+        chatguesses = ChatGuess.all().filter('chatroom =', chatroom).fetch(2)
+        for chatguess in chatguesses:
+            if ChatGuess.user.get_value_for_datastore(chatguess).name() == fb_uid:
+                local_guess_uid = ChatGuess.guess.get_value_for_datastore(chatguess).name()
+                local_guess_correct = chatguess.correct
+            else:
+                foreign_guess_uid = ChatGuess.guess.get_value_for_datastore(chatguess).name()
+                foreign_guess_correct = chatguess.correct
 
         for user_key in chatroom.users:
             if user_key.name() != fb_uid:
@@ -155,8 +198,19 @@ class PostHandlers(RequestHandler):
                 )
                 channel_send(client_id, {
                     'kind': 'disconnect',
-                    'end_type': 1
+                    'end_type': 1,
+                    'yourGuessId': foreign_guess_uid,
+                    'yourGuessCorrect': foreign_guess_correct,
+                    'theirGuessId': local_guess_uid,
+                    'theirGuessCorrect': local_guess_correct
                 })
+
+        return {
+            'yourGuessId': local_guess_uid,
+            'yourGuessCorrect': local_guess_correct,
+            'theirGuessId': foreign_guess_uid,
+            'theirGuessCorrect': foreign_guess_correct
+        }
 
 class Ajax(GetHandlers, PostHandlers):
     middleware = [SessionMiddleware()]
