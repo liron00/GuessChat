@@ -56,11 +56,18 @@ G.definePage("home", function() {
 
         chatUI = new G.controls.ChatUI().bind({
             "chatEnded": function(endingData) {
-                G.log("ending data: ", endingData);
+                endingUI = new G.controls.EndingUI(endingData).bind({
+                    "startNewChat": function() {
+                        startChat();
+                    }
+                });
+                elems.chatSection.empty().append(
+                    endingUI.renderHere()
+                );
             }
         });
 
-        elems.chatSection.show().append(
+        elems.chatSection.empty().show().append(
             chatUI.renderHere()
         );
 
