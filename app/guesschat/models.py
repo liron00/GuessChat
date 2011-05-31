@@ -3,6 +3,8 @@ from google.appengine.ext import db
 class User(db.Model):
     # key_name: fb_uid
     fb_access_token = db.StringProperty()
+    name = db.StringProperty()
+    gender = db.IntegerProperty()
     random = db.FloatProperty()
     add_dt = db.DateTimeProperty(auto_now_add=True)
 

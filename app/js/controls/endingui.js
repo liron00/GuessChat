@@ -164,17 +164,54 @@ G.defineControl("EndingUI", {
             elems.outcomeSection.append(
                 $DIV().css({
                     "font-size": 18,
-                    "font-family": "Impact",
-                    "color": "green"
+                    "font-weight": "bold",
+                    "font-family": "Tahoma"
                 }).text("You made a GuessChat connection!")
             );
+
+            FB.api(_this.endingData.yourGuessId, _this.func(function(them) {
+                if (them.error) {
+                    elems.outcomeSection.append(
+                        $DIV().text("Couldn't load your partner's info.")
+                    );
+                    return;
+                }
+
+                var nameText;
+                if (them.gender == "male") {
+                    nameText = "His name is";
+                } else if (them.gender == "female") {
+                    nameText = "Her name is";
+                } else {
+                    nameText = "Their name is";
+                }
+                elems.outcomeSection.append(
+                    $DIV().css({
+                        "margin-top": 12
+                    }).append(
+                        $SPAN().css({
+                            "font-size": 18,
+                            "font-weight": "bold"
+                        }).text(nameText),
+                        $BR(),
+                        G.util.makeExtLink(them.name, "http://facebook.com/profile.php?id=" + _this.endingData.yourGuessId).css({
+                            "color": "green",
+                            "font-size": 36,
+                            "font-weight": "bold",
+                            "text-decoration": "underline"
+                        })
+                    )
+                );
+            }));
+
         } else {
             elems.outcomeSection.append(
                 $DIV().css({
                     "font-size": 18,
-                    "font-family": "Impact",
+                    "font-weight": "bold",
+                    "font-family": "Tahoma",
                     "color": "red"
-                }).text("No GuessChat connection.")
+                }).text("No GuessChat chemistry.")
             );
         }
     }

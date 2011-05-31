@@ -38,6 +38,8 @@ class PostHandlers(RequestHandler):
         user = User.get_or_insert(
             response_obj['id'],
             fb_access_token=fb_access_token,
+            name=response_obj['name'],
+            gender={'male': 1, 'female': 2}[response_obj['gender']],
             random=random.random()
         )
         self.session['fb_uid'] = response_obj['id']
