@@ -3,7 +3,7 @@ G.definePage("home", function() {
 
     $("#dynamic_body").empty().append(
         elems.homeSection = $DIV().css({
-            "margin": 12
+            "margin": 24
         }).append(
             elems.startButton = new G.controls.Button().set({
                 "text": "Enter"
@@ -20,7 +20,7 @@ G.definePage("home", function() {
             $DIV().css({
                 "margin-top": 20
             }).append(
-                $("<fb:facepile></fb:facepile>")
+                $('<fb:like href="http://www.guesschat.net" send="true" width="450" show_faces="true" font=""></fb:like>')
             )
         ),
         elems.chatSection = $DIV().css({
