@@ -28,7 +28,7 @@ G.defineControl("ChatUI", {
                     return false;
                 }),
                 "pressNormal": _this.func(function() {
-                    if (!_this._sentTyping) {
+                    if (_this.chatting && !_this._sentTyping) {
                         G.post(
                             "typing",
                             {
