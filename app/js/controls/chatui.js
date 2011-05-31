@@ -102,7 +102,7 @@ G.defineControl("ChatUI", {
                 ),
                 $TD().css({
                     "vertical-align": "top",
-                    "width": 250
+                    "width": 220
                 }).append(
                     elems.strangerSection = $DIV()
                 )
