@@ -187,10 +187,12 @@ G.defineControl("EndingUI", {
                 }
                 elems.outcomeSection.append(
                     $DIV().css({
-                        "margin-top": 12
+                        "margin-top": 24,
+                        "margin-bottom": 12
                     }).append(
                         $SPAN().css({
                             "font-size": 18,
+                            "font-family": "Tahoma",
                             "font-weight": "bold"
                         }).text(nameText),
                         $BR(),
