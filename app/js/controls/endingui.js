@@ -108,11 +108,24 @@ G.defineControl("EndingUI", {
 
         var makeGuessSection = function(guessId, guessCorrect, guessSection, correctnessSection) {
             if (guessId) {
+                var nameSection = $SPAN();
+
+                FB.api(guessId, _this.func(function(data) {
+                    var name = data.first_name || "";
+                    if (data.last_name) {
+                        name += " " + data.last_name.substring(0, 1).toUpperCase() + ".";
+                    }
+                    nameSection.text(name);
+                }));
+
                 guessSection.append(
                     $DIV().css({
-                        "margin-bottom": 12
+                        "margin-bottom": 12,
+                        "text-align": "center"
                     }).append(
-                        G.util.$IMG("http://graph.facebook.com/" + guessId + "/picture?type=large")
+                        G.util.$IMG("http://graph.facebook.com/" + guessId + "/picture?type=large"),
+                        $BR(),
+                        nameSection
                     )
                 );
 

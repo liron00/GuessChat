@@ -128,12 +128,35 @@ G.defineControl("ChatUI", {
             "strangers": function() {
                 var strangerOptions = $.map(_this.strangerIds, function(strangerId) {
                     return {
-                        "text": G.util.$IMG("http://graph.facebook.com/" + strangerId + "/picture?type=square").css({
+                        "text": $DIV().css({
+                            "text-align": "center",
                             "cursor": "pointer"
-                        }),
+                        }).append(
+                            G.util.$IMG("http://graph.facebook.com/" + strangerId + "/picture?type=square").css({
+                                "cursor": "pointer"
+                            }),
+                            $BR(),
+                            elems["strangerName" + strangerId] = $SPAN()
+                        ),
                         "value": strangerId
                     };
                 });
+
+                FB.api("?ids=" + _this.strangerIds.join(","), _this.func(function(data) {
+                    $.each(_this.strangerIds, function(i, strangerId) {
+                        var s = data[strangerId];
+
+                        G.graph[strangerId] = s;
+
+                        var name = s.first_name;
+                        if (s.last_name) {
+                            name += " " + s.last_name.substring(0, 1).toUpperCase() + ".";
+                        }
+                        if (s) {
+                            elems["strangerName" + strangerId].text(name);
+                        }
+                    });
+                }));
 
                 _this.controls.strangerSelector = new G.controls.RadioSelector(strangerOptions).set({
                     "rowSize": 3,

@@ -38,6 +38,8 @@ $.extend(G.page, {
             })
         );
 
+        G.graph = {}; // FB graph node: data
+
         if (G.page.name) {
             G.pages[G.page.name]();
         }
