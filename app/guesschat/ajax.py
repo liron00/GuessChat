@@ -16,8 +16,10 @@ from guesschat.writing import eventlogging
 from guesschat.client import to_client, from_client
 
 ready_chatroom = None
+channels = []
 
 def channel_send(client_id, message_obj):
+    logging.debug('***CHANNELS: %s' % channels)
     channel.send_message(client_id, json.json_encode(message_obj))
 
 class GetHandlers(RequestHandler):
@@ -96,6 +98,7 @@ class PostHandlers(RequestHandler):
             chatroom.key().id(), user.key().name()
         )
         channel_token = channel.create_channel(client_id)
+        channels.append(client_id)
 
         self.log_event('start chat', matched=matched)
 
@@ -122,10 +125,10 @@ class PostHandlers(RequestHandler):
         chatmessage.put()
 
         # Send the message on the other users' channels
-        for user_key in chatmessage.chatroom.users:
-            secret_chatmessage_data = to_client.chatmessage(chatmessage)
-            secret_chatmessage_data['userId'] = None # Strip out the userId
+        secret_chatmessage_data = to_client.chatmessage(chatmessage)
+        secret_chatmessage_data['userId'] = None # Strip out the userId
 
+        for user_key in chatmessage.chatroom.users:
             if user_key.name() != fb_uid:
                 client_id = '%s_%s' % (
                     chatmessage.chatroom.key().id(), user_key.name()

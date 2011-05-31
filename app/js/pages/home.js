@@ -5,9 +5,6 @@ G.definePage("home", function() {
         elems.homeSection = $DIV().css({
             "margin": 12
         }).append(
-            $DIV().css({
-                "margin-bottom": 12
-            }).text("Welcome to the home page."),
             elems.startButton = new G.controls.Button().set({
                 "text": "Enter"
             }).style({
