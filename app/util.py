@@ -15,7 +15,7 @@ def get_random_uids(n, exclude=[]):
         uids.update(key.name() for key in user_keys)
         uids.difference_update(exclude)
 
-    uids = list(uids)
+    uids = list(uids)[:n]
     random.shuffle(uids)
 
     return uids
