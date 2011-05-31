@@ -35,6 +35,7 @@ def get_js_file_paths(deb=False):
         'jquery.caret.js',
         'jquery.scrollTo.js',
         'jquery.hashchange.js',
+        'jquery.titlealert.min.js',
         'date.js',
         'md5.js'
     ):

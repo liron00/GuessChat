@@ -166,6 +166,27 @@ class PostHandlers(RequestHandler):
         )
         chatguess.put()
 
+    def typing(self, chatroom_id):
+        fb_uid = self.session.get('fb_uid')
+        assert fb_uid, 'No user'
+
+        chatroom = ChatRoom.get_by_id(chatroom_id)
+        if not chatroom:
+            raise Error('Invalid chatroom')
+        elif not any(user_key.name() == fb_uid for user_key in chatroom.users):
+            raise Error('You are not in this chatroom.')
+        elif chatroom.end_dt:
+            raise Error('Chat has ended.')
+
+        for user_key in chatroom.users:
+            if user_key.name() != fb_uid:
+                client_id = '%s_%s' % (
+                    chatroom.key().id(), user_key.name()
+                )
+                channel_send(client_id, {
+                    'kind': 'typing'
+                })
+
     def disconnect(self, chatroom_id):
         fb_uid = self.session.get('fb_uid')
         assert fb_uid, 'No user'

@@ -5,7 +5,9 @@ G.defineControl("ChatUI", {
             "socket": null,
             "chatRoom": null,
             "chatting": false,
-            "strangerIds": null
+            "strangerIds": null,
+
+            "_sentTyping": false
         });
 
         _this.createField("controls", {
@@ -24,6 +26,22 @@ G.defineControl("ChatUI", {
                 "enterDown": _this.func(function() {
                     _this.sendMessage();
                     return false;
+                }),
+                "pressNormal": _this.func(function() {
+                    if (!_this._sentTyping) {
+                        G.post(
+                            "typing",
+                            {
+                                "chatroom_id": _this.chatRoom.id
+                            }
+                        );
+                        var t = setTimeout(_this.func(function() {
+                            if (_this._sentTyping == t) {
+                                _this._sentTyping = false;
+                            }
+                        }), 5000);
+                        _this._sentTyping = t;
+                    }
                 })
             }),
 
@@ -117,6 +135,10 @@ G.defineControl("ChatUI", {
             },
 
             "logMsg": function(msgContents) {
+                if (elems.typing) {
+                    elems.typing.remove();
+                }
+
                 var msgDiv = G.util.makeDiv(msgContents);
                 msgDiv.css({
                     "margin-bottom": 8
@@ -198,12 +220,33 @@ G.defineControl("ChatUI", {
                         "margin-bottom": 8
                     })
                 );
+            },
+
+            typing: function() {
+                if (elems.typing) {
+                    elems.typing.remove();
+                }
+
+                var typingDiv = elems.typing = $DIV().css({
+                    "font-weight": "bold"
+                }).text("Stranger is typing...");
+                _this.logMsg(typingDiv);
+
+                setTimeout(_this.func(function() {
+                    typingDiv.remove();
+                }), 5000);
             }
         });
     },
 
-    logMsg: function(msgContents) {
+    logMsg: function(msgContents, showAlert) {
         _this.render("logMsg", msgContents);
+
+        if (showAlert != false) {
+            $.titleAlert("*GuessChat*", {
+                "requireBlur": true
+            });
+        }
     },
 
     logChatMessage: function(chatMessage) {
@@ -309,6 +352,9 @@ G.defineControl("ChatUI", {
                             var chatMessage = G.data.ChatMessage.fromServer(messageObj.chatMessage);
                             _this.logChatMessage(chatMessage);
 
+                        } else if (messageObj.kind == "typing") {
+                            _this.render("typing");
+
                         } else if (messageObj.kind == "disconnect") {
                             _this.logOfficialMsg("Your partner has disconnected.");
                             _this.handleDisconnect();
@@ -389,5 +435,7 @@ G.defineControl("ChatUI", {
 
         _this.controls.inputBox.setText("");
         _this.logChatMessage(chatMessage);
+
+        _this._sentTyping = false;
     }
 });
